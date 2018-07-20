@@ -8,13 +8,37 @@
 
 import UIKit
 import SpriteKit
+import AVFoundation
 
 class GameViewController: UIViewController {
   
-  // MARK: Properties
-  
-  // The scene draws the tiles and cookie sprites, and handles swipes.
-  var scene: GameScene!
+    // MARK: Properties
+    
+    // The scene draws the tiles and cookie sprites, and handles swipes.
+    var scene: GameScene!
+    
+    var movesLeft = 0
+    var score = 0
+    
+    lazy var backgroundMusic: AVAudioPlayer? = {
+        guard let url = Bundle.main.url(forResource: "Mining by Moonlight", withExtension: "mp3") else {
+            return nil
+        }
+        do {
+            let player = try AVAudioPlayer(contentsOf: url)
+            player.numberOfLoops = -1
+            return player
+        } catch {
+            return nil
+        }
+    }()
+    
+    // MARK: IBOutlets
+    @IBOutlet weak var gameOverPanel: UIImageView!
+    @IBOutlet weak var targetLabel: UILabel!
+    @IBOutlet weak var movesLabel: UILabel!
+    @IBOutlet weak var scoreLabel: UILabel!
+    @IBOutlet weak var shuffleButton: UIButton!
   
   // The level contains the tiles, the cookies, and most of the gameplay logic.
   // Needs to be ! because it's not set in init() but in viewDidLoad().
@@ -47,7 +71,7 @@ class GameViewController: UIViewController {
     scene.scaleMode = .aspectFill
     
     // Load the level.
-    level = Level(filename: "Level_1")
+    level = Level(filename: "Level_0")
     scene.level = level
     
     scene.addTiles()
