@@ -29,11 +29,16 @@
 import Foundation
 let numColumns = 9
 let numRows = 9
+let numLevels = 4 // Excluding level 0
+
 
 class Level {
   private var cookies = Array2D<Cookie>(columns: numColumns, rows: numRows)
   private var tiles = Array2D<Tile>(columns: numColumns, rows: numRows)
   private var possibleSwaps: Set<Swap> = []
+  var targetScore = 0
+  var maximumMoves = 0
+  private var comboMultiplier = 0
   
   init(filename: String) {
     // 1
@@ -51,6 +56,9 @@ class Level {
         }
       }
     }
+    //
+    targetScore = levelData.targetScore
+    maximumMoves = levelData.moves
   }
   
   func tileAt(column: Int, row: Int) -> Tile? {
@@ -296,6 +304,9 @@ class Level {
     removeCookies(in: horizontalChains)
     removeCookies(in: verticalChains)
     
+    calculateScores(for: horizontalChains)
+    calculateScores(for: verticalChains)
+    
     return horizontalChains.union(verticalChains)
   }
   
@@ -372,4 +383,16 @@ class Level {
     return columns
   }
 
+  private func calculateScores(for chains: Set<Chain>) {
+    // 3-chain is 60 pts, 4-chain is 120, 5-chain is 180, and so on
+    for chain in chains {
+      chain.score = 60 * (chain.length - 2) * comboMultiplier
+      comboMultiplier += 1
+    }
+  }
+  
+  func resetComboMultiplier() {
+    comboMultiplier = 1
+  }
+  
 }
